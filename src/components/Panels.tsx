@@ -13,14 +13,29 @@ const Panels: React.FC = () => {
         );
     }
 
+    const { properties, layerName } = selectedFeature;
+
     return (
         <div style={panelStyle}>
-            <h3>Thông tin vùng</h3>
-            <p><b>Tên:</b> {selectedFeature.tenxa}</p>
-            <p><b>Kinh độ:</b> {selectedFeature.longtitude}</p>
-            <p><b>Vĩ độ:</b> {selectedFeature.latitude}</p>
+            <h3>Thông tin từ lớp: {layerName}</h3>
+            <div style={{ maxHeight: "300px", overflowY: "auto" }}>
+                {Object.entries(properties).map(([key, value]) => (
+                    <p key={key}>
+                        <b>{key}:</b> {String(value)}
+                    </p>
+                ))}
+            </div>
         </div>
     );
+
+    // return (
+    //     <div style={panelStyle}>
+    //         <h3>Thông tin vùng</h3>
+    //         <p><b>Tên:</b> {selectedFeature.tenxa}</p>
+    //         <p><b>Kinh độ:</b> {selectedFeature.longtitude}</p>
+    //         <p><b>Vĩ độ:</b> {selectedFeature.latitude}</p>
+    //     </div>
+    // );
 };
 
 const panelStyle: React.CSSProperties = {

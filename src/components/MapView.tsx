@@ -39,7 +39,7 @@ const MapView: React.FC = () => {
         const handleClick = (evt: any) => {
             let foundFeature = null;
 
-            map.forEachFeatureAtPixel(evt.pixel, (feature) => {
+            map.forEachFeatureAtPixel(evt.pixel, (feature, layer) => {
                 if (!feature) {
                     highlightService.clearHighlight(map);
                     return;
@@ -51,7 +51,14 @@ const MapView: React.FC = () => {
 
                 const properties = feature.getProperties();
                 console.log("Feature clicked:", properties);
-                setSelectedFeature(properties);
+
+                //setSelectedFeature(properties);
+
+                setSelectedFeature({
+                    properties: properties,
+                    layerName: foundFeature.get("layer") || "unknown",
+                });
+
                 return true; // Dừng khi đã chọn được 1 feature
             });
         };
