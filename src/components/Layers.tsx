@@ -1,7 +1,5 @@
 import React, { useEffect } from "react";
 import { useMap } from "../context/MapContext";
-import View from "ol/View";
-import { fromLonLat } from "ol/proj";
 import { VectorTile as VectorTileLayer } from "ol/layer";
 import { VectorTile as VectorTileSource } from "ol/source";
 import MVT from "ol/format/MVT";
@@ -26,7 +24,6 @@ const Layers: React.FC = () => {
             }),
         });
         map.addLayer(vectorTileLayer);
-        console.log("Vector tile layer added.", vectorTileLayer);
 
         return () => { map.removeLayer(vectorTileLayer); };
     }, [map]);

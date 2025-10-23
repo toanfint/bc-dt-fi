@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import "ol/ol.css";
 import Map from "ol/Map";
+import { Feature } from "ol";
 import { createMBTilesSource, createBaseTileLayer, initializeMap } from '../utils/mapUtils';
 import { useMap } from "../context/MapContext";
+import { highlightService } from "../services/HighlightService";
 
 const BaseUrl: string = import.meta.env.VITE_API_BASE_URL;
 const MapName: string = import.meta.env.VITE_MAP_DEFAULT_NAME;
@@ -10,15 +12,13 @@ const MapName: string = import.meta.env.VITE_MAP_DEFAULT_NAME;
 const MapView: React.FC = () => {
     const mapRef = useRef<HTMLDivElement | null>(null);
 
-    const { setMap } = useMap();
+    const { setMap, setSelectedFeature } = useMap();
 
     // useRef để lưu trữ đối tượng Map đã khởi tạo (để cleanup dễ dàng hơn)
     const olMap = useRef<Map | null>(null);
 
     useEffect(() => {
         if (!mapRef.current) return;
-
-        console.log("Initializing map...", BaseUrl, MapName);
 
         // 2. Tạo Source và Layer
         const tileSource = createMBTilesSource({
@@ -35,18 +35,34 @@ const MapView: React.FC = () => {
 
         setMap(olMap.current);
 
-        map.on("singleclick", async (evt) => {
-            const viewResolution = map.getView().getResolution() || 1;
-            const [x, y] = evt.coordinate;
+        // Click on Commune
+        const handleClick = (evt: any) => {
+            let foundFeature = null;
 
-            console.log("Info data:");
-        });
+            map.forEachFeatureAtPixel(evt.pixel, (feature) => {
+                if (!feature) {
+                    highlightService.clearHighlight(map);
+                    return;
+                }
+
+                foundFeature = feature;
+
+                highlightService.showHighlight(foundFeature as Feature, map);
+
+                const properties = feature.getProperties();
+                console.log("Feature clicked:", properties);
+                setSelectedFeature(properties);
+                return true; // Dừng khi đã chọn được 1 feature
+            });
+        };
+
+        map.on("singleclick", handleClick);;
 
         // Cleanup: Xóa map khi component unmount
         return () => {
             olMap.current?.setTarget(undefined);
         };
-    }, [setMap]);
+    }, [setMap, setSelectedFeature]);
 
     return (
         // Đảm bảo div có kích thước để hiển thị bản đồ
